@@ -13,7 +13,7 @@ app.get("/posts/:id/comments", (req, res) => {
   res.send(commentsByPostId[req.params.id] || []);
 });
 
-app.post("/posts/:id/comments", async (req, res) => {
+app.post("/posts/:id/comments/create", async (req, res) => {
   const postId = req.params.id;
   const commentId = crypto.randomUUID();
   const { content } = req.body;
@@ -23,7 +23,7 @@ app.post("/posts/:id/comments", async (req, res) => {
   commentsByPostId[postId] = comments;
   console.log(commentsByPostId[postId]);
 
-  await axios.post("http://localhost:4005/events", {
+  await axios.post("http://event-bus-srv:4005/events", {
     type: "CommentCreated",
     data: {
       id: commentId,
@@ -47,7 +47,7 @@ app.post("/events", async (req, res) => {
     const comment = comments.find((comment) => comment.id === id);
     comment.status = status;
 
-    await axios.post("http://localhost:4005/events", {
+    await axios.post("http://event-bus-srv:4005/events", {
       type: "CommentUpdated",
       data: { id, postId, content, status, content },
     });
